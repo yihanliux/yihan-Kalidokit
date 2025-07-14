@@ -1,124 +1,166 @@
-@font-face {
-    font-family: "Jelly";
-    font-display: block;
-    src: url("https://yeemachine.github.io/kalidoface-live2d-models/Font/kalidoface-jelly.ttf") format("truetype");
-}
-h1 {
-    font-family: "Jelly";
-    font-size: 32px;
-    color: white;
-    position: absolute;
-    top: -12px;
-    left: 16px;
-    font-weight: normal;
-    -webkit-font-feature-settings: "liga";
-    font-feature-settings: "liga";
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-h1:hover {
-    color: #13a3f3;
-}
-a,
-a:visited,
-a:link {
-    text-decoration: none;
-    color: #222;
-    display: inline-block;
-}
-a:hover,
-a:visited:hover,
-a:link:hover {
-    color: #13a3f3;
-    cursor: pointer;
-}
-.preview {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    overflow: hidden;
-    border-radius: 8px;
-    background: #222;
-}
-video {
-    max-width: 400px;
-    height: auto;
-    transform: scale(-1, 1);
-}
-.preview canvas {
-    transform: scale(-1, 1);
-}
+/* --- 1. 全局与布局样式 --- */
+
+/* body基础设置 */
 body {
-    margin: 0;
+  margin: 0;
+  overflow: hidden; /* 防止出现不必要的滚动条 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; /* 设置一个通用的无衬线字体 */
 }
-canvas {
-    display: block;
+
+/* 主容器，使用flex布局实现分屏 */
+.main-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
 }
-.guides {
+
+/* 左右两个面板的基础样式 */
+#left-panel, #right-panel {
+  flex: 1; /* 各占50%宽度 */
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100vh;
+  overflow-y: auto; /* 内容超高时，允许内部滚动 */
+  position: relative; /* 为内部绝对定位的元素提供参照 */
+}
+
+
+/* --- 2. 左侧面板样式 (视频播放器) --- */
+#left-panel {
+  background-color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#left-panel h2 {
+  color: #333;
+}
+
+/* 隐藏原始的文件上传输入框 */
+#video-upload {
+    display: none;
+}
+/* 自定义文件上传按钮的样式 */
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+.custom-file-upload:hover {
+    background-color: #0056b3;
+}
+
+/* 视频播放器的样式 */
+#playback-video {
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  background-color: #000;
+  border-radius: 8px;
+}
+
+
+/* --- 3. 右侧面板样式 (虚拟形象) --- */
+
+#right-panel {
+  background-color: #f0f0f0; /* 将背景色调暗，更适合虚拟形象展示 */
+  padding: 0; /* 右侧面板不需要内边距，让3D画布完全填充 */
+}
+
+/* 切换摄像头按钮的样式 */
+#toggle-video-btn {
+  position: absolute; /* 相对于 #right-panel 定位 */
+  top: 20px;
+  left: 20px;
+  z-index: 100; /* 确保在最上层 */
+  padding: 10px 15px;
+  font-size: 14px;
+  background-color: #ffffff;
+  color: #333;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+#toggle-video-btn:hover {
+  background-color: #f0f0f0;
+}
+
+
+/* --- 3. 右侧面板样式 (虚拟形象) --- */
+
+#right-panel {
+  background-color: #f0f0f0;
+  padding: 0; /* 右侧面板不需要内边距，让3D画布完全填充 */
+  /* 关键：必须有这个属性，作为内部绝对定位元素的"锚点" */
+  position: relative;
+}
+
+/* 切换摄像头按钮的样式 */
+#toggle-video-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  /* ... (按钮的其他样式保持不变) ... */
+  padding: 10px 15px;
+  font-size: 14px;
+  background-color: #ffffff;
+  color: #333;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+#toggle-video-btn:hover {
+  background-color: #f0f0f0;
+}
+
+/* 新增：用于隐藏元素的通用类 */
+.hidden {
+  display: none !important; /* 使用 !important 确保该样式能覆盖其他 display 设置 */
+}
+
+
+/* 摄像头预览窗口的容器 (现在改为完全覆盖其父容器) */
+.preview {
+  /* 设置为绝对定位，以便填满父容器 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  /* 背景色，以防视频加载慢时出现空白 */
+  background-color: #000;
+
+  /* 移除了所有小窗口相关的样式，如 apect-ratio, bottom, right, width, border 等 */
+}
+
+/* 摄像头视频画面样式 (保持不变，它会自适应新的 .preview 尺寸) */
+.preview .input_video {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
-    height: auto;
     width: 100%;
-    z-index: 1;
-}
-nav {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    display: flex;
-}
-nav img {
-    width: 36px;
-    height: auto;
-    margin-left: 22px;
-}
-section {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    padding: 32px 0 16px 0;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    background: rgb(0, 0, 0);
-    background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
-    color: white;
-    z-index: 2;
-    /* border-radius: 40px; */
-}
-p {
-    color: white;
-    padding: 8px 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",
-        sans-serif;
-    margin: 0;
-}
-.preview a {
-    border-radius: 24px;
-    margin: 0 4px;
-}
-.preview a:hover {
-    background: #ffffff20;
-}
-a.current {
-    background: #13a3f3;
-    pointer-events: none;
+    height: 100%;
+    object-fit: cover; /* 确保视频内容铺满容器 */
+    transform: scaleX(-1);
 }
 
-.linkOut {
+/* 骨骼辅助线画布的样式 (保持不变，它也会自适应新的 .preview 尺寸) */
+.preview .guides {
     position: absolute;
-    bottom: 16px;
-    left: 16px;
-    display: inline;
-    color: black;
-    padding: 0;
-}
-
-@media only screen and (max-width: 600px) {
-    video {
-        max-width: 160px;
-    }
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+    z-index: 1; /* 确保辅助线在视频之上 */
 }
