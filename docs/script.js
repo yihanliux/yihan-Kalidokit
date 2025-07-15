@@ -111,7 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 异步加载VRM模型
     loader.load(
-        "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981",
+        // "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981",
+        "/models/model1.vrm",
         (gltf) => {
             // 移除不必要的骨骼，这是一个针对VRM的优化
             THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
@@ -255,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 设置Pose模型的参数
     pose.setOptions({
-        modelComplexity: 1, // 模型复杂度，1表示中等模型
+        modelComplexity: 2, // 模型复杂度，1表示中等模型
         smoothLandmarks: true, // 平滑标定点以减少抖动
         minDetectionConfidence: 0.5, // 最低检测置信度
         minTrackingConfidence: 0.5, // 最低跟踪置信度
