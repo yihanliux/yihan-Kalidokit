@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "Hips",
             {
                 x: riggedPose.Hips.position.x,
-                y: riggedPose.Hips.position.y + 1, // 稍微抬高模型位置
+                y: riggedPose.Hips.position.y + 1.4, // 稍微抬高模型位置
                 z: -riggedPose.Hips.position.z, // 反转Z轴以匹配Three.js坐标系
             },
             1,
